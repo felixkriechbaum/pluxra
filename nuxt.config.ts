@@ -8,6 +8,16 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  components: {
+    dirs: [
+      {
+        path: '~/components/ui',
+        pattern: '**/*.vue',
+        pathPrefix: false,
+      },
+      '~/components',
+    ],
+  },
   router: {
     middleware: ['auth'],
   },
