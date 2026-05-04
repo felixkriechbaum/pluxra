@@ -8,6 +8,9 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
+  router: {
+    middleware: ['auth'],
+  },
   runtimeConfig: {
     dbUrl: '',
     firebaseProjectId: '',
