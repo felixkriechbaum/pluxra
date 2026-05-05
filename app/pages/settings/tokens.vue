@@ -29,19 +29,25 @@
     <div class="border rounded-lg p-4 space-y-3">
       <h2 class="font-medium text-sm">Create new token</h2>
       <Input v-model="form.label" placeholder="Label (e.g. NAS Token)" />
-      <select v-model="form.widgetId" class="w-full border rounded px-2 py-1 text-sm bg-background">
+      <select v-model="form.widgetId" class="w-full border rounded px-2 py-1 text-sm bg-background cursor-pointer">
         <option value="">Select widget...</option>
         <option v-for="w in (allWidgets as any[])" :key="w.id" :value="w.id">
           {{ w.pluginId }} ({{ w.id.slice(0, 8) }})
         </option>
       </select>
-      <select v-model.number="form.lifetimeMs" class="w-full border rounded px-2 py-1 text-sm bg-background">
-        <option :value="3_600_000">1 hour</option>
-        <option :value="86_400_000">1 day</option>
-        <option :value="2_592_000_000">30 days</option>
-        <option :value="31_536_000_000">1 year</option>
-      </select>
-      <Button :disabled="!form.widgetId || !form.label" @click="onCreate">Create token</Button>
+      <div class="space-y-1">
+        <label class="text-sm font-medium">Expires on (max. 1 year from today)</label>
+        <input
+          v-model="form.expiresOn"
+          type="date"
+          :min="minDate"
+          :max="maxDate"
+          class="w-full border rounded px-2 py-1 text-sm bg-background cursor-pointer"
+        />
+      </div>
+      <Button :disabled="!form.widgetId || !form.label || !form.expiresOn" @click="onCreate">
+        Create token
+      </Button>
     </div>
   </div>
 </template>
@@ -60,13 +66,29 @@ const { data: allWidgets } = useFetch('/api/widgets/all', {
   },
 })
 
-const form = reactive({ label: '', widgetId: '', lifetimeMs: 86_400_000 })
+const minDate = computed(() => {
+  const d = new Date()
+  d.setHours(d.getHours() + 1)
+  return d.toISOString().slice(0, 10)
+})
+
+const maxDate = computed(() => {
+  const d = new Date()
+  d.setFullYear(d.getFullYear() + 1)
+  return d.toISOString().slice(0, 10)
+})
+
+const form = reactive({ label: '', widgetId: '', expiresOn: '' })
 
 function isExpired(expiresAt: string) { return new Date(expiresAt) < new Date() }
 
 async function onCreate() {
-  await createToken(form.widgetId, form.label, form.lifetimeMs)
+  const expiresAt = new Date(form.expiresOn)
+  expiresAt.setHours(23, 59, 59, 999)
+  const lifetimeMs = expiresAt.getTime() - Date.now()
+  await createToken(form.widgetId, form.label, lifetimeMs)
   form.label = ''
   form.widgetId = ''
+  form.expiresOn = ''
 }
 </script>
