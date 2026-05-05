@@ -2,7 +2,7 @@ services:
   pluxra:
     image: ghcr.io/felixkriechbaum/pluxra:latest
     ports:
-      - "3000:3000"
+      - "3003:3000"
     environment:
       NUXT_DB_URL: mysql://user:password@host:3306/pluxra
       NUXT_FIREBASE_PROJECT_ID: your-project-id
