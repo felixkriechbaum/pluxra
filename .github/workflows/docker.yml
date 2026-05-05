@@ -3,6 +3,15 @@ name: Build & Push Docker Image
 on:
   push:
     branches: [master]
+    paths:
+      - 'app/**'
+      - 'server/**'
+      - 'plugins/**'
+      - 'package.json'
+      - 'bun.lock'
+      - 'nuxt.config.ts'
+      - 'Dockerfile'
+      - '.github/workflows/docker.yml'
 
 jobs:
   build:
