@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\({deps: p.dependencies, dev: p.devDependencies}, null, 2\\)\\)\")",
+      "PowerShell(Get-NetTCPConnection *)",
+      "PowerShell(Get-Process *)",
+      "Bash(node -e \"const p=require\\('./package.json'\\); console.log\\(JSON.stringify\\(p.scripts, null, 2\\)\\)\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git commit -m 'chore: simplify docker-compose to app-only, external DB *)",
+      "Bash(git commit -m 'feat: auto-run DB migrations on server startup *)",
+      "Bash(git commit -m 'fix: use Node.js runtime instead of Bun to fix jose/jwks-rsa resolution *)"
+    ]
+  }
+}
