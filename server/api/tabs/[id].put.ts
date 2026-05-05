@@ -6,6 +6,8 @@ import { z } from 'zod'
 const bodySchema = z.object({
   title: z.string().min(1).max(255).optional(),
   position: z.number().int().min(0).optional(),
+  cols: z.number().int().min(1).max(48).optional(),
+  rows: z.number().int().min(1).max(48).optional(),
 })
 
 export default defineEventHandler(async (event) => {

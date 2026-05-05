@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 const { user } = useUser()
-const { pages } = usePages()
+const { tabs } = useTabs()
 const router = useRouter()
 
 watchEffect(() => {
@@ -12,7 +12,7 @@ watchEffect(() => {
     router.push('/login')
     return
   }
-  const list = pages.value as any[]
-  if (list?.length) router.push(`/${list[0].slug}`)
+  const list = tabs.value
+  if (list?.length) router.push(`/${list[0].id}`)
 })
 </script>

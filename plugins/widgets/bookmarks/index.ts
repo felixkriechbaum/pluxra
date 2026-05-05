@@ -12,10 +12,10 @@ export const bookmarksPlugin: WidgetPlugin = {
     defaultSize: { colSpan: 4, rowSpan: 4 },
     configSchema: z.object({
       title: z.string().default('Bookmarks'),
+      display: z.enum(['both', 'label', 'icon']).default('both'),
       items: z.array(z.object({
         label: z.string(),
-        url: z.string().url(),
-        icon: z.string().optional(),
+        url: z.string(),
       })).default([]),
     }),
   },

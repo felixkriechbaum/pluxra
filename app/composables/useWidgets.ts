@@ -1,5 +1,5 @@
 export function useWidgets(tabId: Ref<string>) {
-  const { getIdToken } = useUser()
+  const { idToken, getIdToken } = useUser()
 
   async function authHeaders() {
     const token = await getIdToken()
@@ -8,7 +8,10 @@ export function useWidgets(tabId: Ref<string>) {
 
   const { data: widgets, refresh } = useFetch(
     () => `/api/widgets?tabId=${tabId.value}`,
-    { headers: authHeaders },
+    {
+      headers: computed(() => idToken.value ? { Authorization: `Bearer ${idToken.value}` } : {}),
+      watch: [idToken, tabId],
+    },
   )
 
   async function createWidget(body: {

@@ -1,38 +1,56 @@
 <template>
-  <header class="h-12 border-b flex items-center px-4 gap-4 bg-card">
-    <nav class="flex gap-1 flex-1 overflow-x-auto">
-      <Button
+  <header class="flex items-end px-2 gap-2 bg-muted/40 border-b border-border">
+    <nav class="flex items-end gap-0.5 flex-1 overflow-x-auto pt-2">
+      <button
         v-for="tab in tabs"
         :key="tab.id"
-        :variant="currentTabId === tab.id ? 'default' : 'ghost'"
-        size="sm"
-        @click="router.push(`/${pageSlug}/${tab.id}`)"
+        :class="[
+          'group flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-t-md border-l border-t border-r -mb-px transition-colors whitespace-nowrap',
+          currentTabId === tab.id
+            ? 'bg-background border-border text-foreground'
+            : 'bg-muted/60 border-transparent text-muted-foreground hover:bg-muted hover:text-foreground',
+        ]"
+        @click="router.push(`/${tab.id}`)"
       >
         {{ tab.title }}
-      </Button>
-      <Button variant="ghost" size="sm" @click="emit('addTab')">+</Button>
+      </button>
+      <button
+        class="flex items-center px-2 py-1.5 text-sm rounded-t-md -mb-px text-muted-foreground hover:text-foreground transition-colors"
+        @click="emit('addTab')"
+      >
+        +
+      </button>
     </nav>
-    <Button variant="outline" size="sm" @click="toggleEditMode">
-      {{ editMode ? 'Done' : 'Edit' }}
-    </Button>
-    <NuxtLink to="/settings/tokens">
-      <Button variant="ghost" size="sm">Tokens</Button>
-    </NuxtLink>
-    <Button variant="ghost" size="sm" @click="logout">Logout</Button>
+    <div class="flex items-center gap-1 pb-1.5 shrink-0">
+      <button
+        class="px-3 py-1 text-xs rounded border border-border hover:bg-accent transition-colors"
+        @click="toggleEditMode"
+      >
+        {{ editMode ? t('done') : t('edit') }}
+      </button>
+      <NuxtLink to="/settings/tokens">
+        <button class="p-1.5 rounded hover:bg-accent transition-colors" :title="t('settings')">
+          <Settings class="h-4 w-4" />
+        </button>
+      </NuxtLink>
+      <button class="px-3 py-1 text-xs rounded hover:bg-accent transition-colors" @click="logout">
+        {{ t('logout') }}
+      </button>
+    </div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { Button } from '@/components/ui/button'
+import { Settings } from 'lucide-vue-next'
 
 defineProps<{
   tabs: { id: string; title: string }[]
-  pageSlug: string
   currentTabId: string
 }>()
 
 const emit = defineEmits<{ addTab: [] }>()
 const { editMode, toggleEditMode } = useGrid()
 const { logout } = useUser()
+const { t } = useLocale()
 const router = useRouter()
 </script>

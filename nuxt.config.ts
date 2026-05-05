@@ -1,4 +1,5 @@
 import tailwindcss from '@tailwindcss/vite'
+import { fileURLToPath, URL } from 'node:url'
 
 export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
@@ -7,6 +8,11 @@ export default defineNuxtConfig({
   css: ['./app/assets/css/main.css'],
   vite: {
     plugins: [tailwindcss()],
+    resolve: {
+      alias: {
+        '#widgets': fileURLToPath(new URL('./plugins/widgets', import.meta.url)),
+      },
+    },
   },
   components: {
     dirs: [
@@ -30,6 +36,7 @@ export default defineNuxtConfig({
       firebaseApiKey: '',
       firebaseAuthDomain: '',
       firebaseProjectId: '',
+      appVersion: process.env.NUXT_PUBLIC_APP_VERSION || 'dev',
     },
   },
 })

@@ -1,6 +1,7 @@
 import { useDb } from '../../utils/db'
-import { users } from '../../db/schema'
+import { users, pages } from '../../db/schema'
 import { eq } from 'drizzle-orm'
+import { randomUUID } from 'uncrypto'
 
 export default defineEventHandler(async (event) => {
   const uid = event.context.uid as string
@@ -12,5 +13,15 @@ export default defineEventHandler(async (event) => {
     await db.insert(users).values({ id: uid, email })
   }
 
-  return { uid, email }
+  const [existingPage] = await db.select().from(pages).where(eq(pages.userId, uid)).limit(1)
+  let pageId: string
+  if (existingPage) {
+    pageId = existingPage.id
+  }
+  else {
+    pageId = randomUUID()
+    await db.insert(pages).values({ id: pageId, userId: uid, title: 'Default', slug: 'default', position: 0 })
+  }
+
+  return { uid, email, pageId }
 })

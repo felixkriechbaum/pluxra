@@ -1,14 +1,17 @@
 export function usePages() {
-  const { getIdToken } = useUser()
+  const { idToken, getIdToken } = useUser()
 
   async function authHeaders() {
     const token = await getIdToken()
     return { Authorization: `Bearer ${token}` }
   }
 
-  const { data: pages, refresh } = useFetch('/api/dashboard-pages', {
-    headers: authHeaders,
-  })
+  const { data: pages, refresh } = useAsyncData('dashboard-pages', async () => {
+    if (!idToken.value) return null
+    return $fetch('/api/dashboard-pages', {
+      headers: { Authorization: `Bearer ${idToken.value}` },
+    })
+  }, { watch: [idToken] })
 
   async function createPage(title: string, slug: string) {
     const headers = await authHeaders()

@@ -18,7 +18,14 @@ export function useUser() {
     _initialized = true
     onAuthStateChanged($firebaseAuth as ReturnType<typeof import('firebase/auth').getAuth>, async (user) => {
       _user.value = user
-      _idToken.value = user ? await user.getIdToken() : null
+      if (user) {
+        const token = await user.getIdToken()
+        _idToken.value = token
+        await $fetch('/api/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      }
+      else {
+        _idToken.value = null
+      }
     })
   }
 

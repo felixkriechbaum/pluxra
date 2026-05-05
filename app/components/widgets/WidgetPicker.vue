@@ -21,7 +21,7 @@
 
 <script setup lang="ts">
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { widgetRegistry } from '~/plugins/widgets/widgetRegistry'
+import { widgetRegistry } from '#widgets/widgetRegistry'
 
 defineProps<{ open: boolean }>()
 const emit = defineEmits<{ 'update:open': [v: boolean]; select: [pluginId: string] }>()

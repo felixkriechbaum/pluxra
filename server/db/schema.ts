@@ -18,6 +18,8 @@ export const tabs = mysqlTable('tabs', {
   pageId: varchar('page_id', { length: 36 }).notNull().references(() => pages.id, { onDelete: 'cascade' }),
   title: varchar('title', { length: 255 }).notNull(),
   position: int('position').notNull().default(0),
+  cols: int('cols').notNull().default(12),
+  rows: int('rows').notNull().default(12),
 })
 
 export const widgets = mysqlTable('widgets', {

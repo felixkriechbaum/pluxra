@@ -7,7 +7,7 @@ export default defineEventHandler(async (event) => {
   const id = getRouterParam(event, 'id')!
   const db = useDb()
 
-  const [page] = await db.select().from(pages).where(and(eq(pages.id, id), eq(pages.userId, uid))).limit(1)
+  const [page] = await db.select().from(pages).where(and(eq(pages.slug, id), eq(pages.userId, uid))).limit(1)
   if (!page) throw createError({ statusCode: 404, message: 'Page not found' })
 
   const pageTabs = await db.select().from(tabs).where(eq(tabs.pageId, id)).orderBy(asc(tabs.position))

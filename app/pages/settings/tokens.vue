@@ -53,17 +53,17 @@
 </template>
 
 <script setup lang="ts">
+definePageMeta({ layout: 'settings' })
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
 const { tokens, createToken, deleteToken, newTokenRaw, clearNewToken } = useIngestTokens()
-const { getIdToken } = useUser()
+const { idToken } = useUser()
 
 const { data: allWidgets } = useFetch('/api/widgets/all', {
-  headers: async () => {
-    const token = await getIdToken()
-    return { Authorization: `Bearer ${token}` }
-  },
+  headers: computed(() => idToken.value ? { Authorization: `Bearer ${idToken.value}` } : {}),
+  watch: [idToken],
 })
 
 const minDate = computed(() => {
