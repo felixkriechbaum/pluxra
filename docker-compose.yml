@@ -4,33 +4,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      NUXT_DB_URL: mysql://pluxra:pluxra@db:3306/pluxra
+      NUXT_DB_URL: mysql://user:password@host:3306/pluxra
       NUXT_FIREBASE_PROJECT_ID: your-project-id
       NUXT_FIREBASE_CLIENT_EMAIL: your-client-email@your-project.iam.gserviceaccount.com
       NUXT_FIREBASE_PRIVATE_KEY: "-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
       NUXT_PUBLIC_FIREBASE_API_KEY: your-api-key
       NUXT_PUBLIC_FIREBASE_AUTH_DOMAIN: your-project.firebaseapp.com
       NUXT_PUBLIC_FIREBASE_PROJECT_ID: your-project-id
-    depends_on:
-      db:
-        condition: service_healthy
     restart: unless-stopped
-
-  db:
-    image: mysql:8
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: pluxra
-      MYSQL_USER: pluxra
-      MYSQL_PASSWORD: pluxra
-    volumes:
-      - db_data:/var/lib/mysql
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-    restart: unless-stopped
-
-volumes:
-  db_data:
