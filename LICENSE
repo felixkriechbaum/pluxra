@@ -1,0 +1,68 @@
+                    GNU GENERAL PUBLIC LICENSE
+                       Version 3, 29 June 2007
+
+ Copyright (C) 2026 Felix Kriechbaum
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+                            Preamble
+
+  The GNU General Public License is a free, copyleft license for
+software and other kinds of works.
+
+  When we speak of free software, we are referring to freedom, not
+price.  Our General Public Licenses are designed to make sure that you
+have the freedom to share and change all versions of a program--to
+make sure it remains free software for all its users.
+
+  To protect your rights, we need to prevent others from denying you
+these rights or restricting you to exercise these rights.  Therefore,
+you have certain responsibilities if you distribute copies of the
+software, or if you modify it: responsibilities to respect the freedom
+of others.
+
+  For example, if you distribute copies of such a program, whether
+gratis or for a fee, you must pass on to the same freedoms to the
+recipients.  You must make sure that they, too, receive or can get the
+source code.  And you must show them these terms so they know their
+rights.
+
+  Developers that use the GNU GPL protect your rights with two steps:
+(1) assert copyright on the software, and (2) offer you this License
+giving you legal permission to copy, distribute and/or modify it.
+
+  For the full license text see: https://www.gnu.org/licenses/gpl-3.0.txt
+
+---
+
+Commons Clause License Condition v1.0
+
+The Software is provided to you by the Licensor under the License,
+as defined below, subject to the following condition.
+
+Without limiting other conditions in the License, the grant of rights
+under the License will not include, and the License does not grant to
+you, the right to Sell the Software.
+
+For purposes of the foregoing, "Sell" means practicing any or all of
+the rights granted to you under the License to provide to third parties,
+for a fee or other consideration (including without limitation fees for
+hosting or consulting/ support services related to the Software), a
+product or service whose value derives, entirely or substantially, from
+the functionality of the Software. Any license notice or attribution
+required by the License must also include this Commons Clause License
+Condition notice.
+
+Software: Personal Dashboard
+License: GNU General Public License v3.0
+Licensor: Felix Kriechbaum
+
+---
+
+Summary of permissions:
+
+  - Free to use for non-commercial purposes
+  - Free to fork and modify
+  - Derived works must remain open source under GPL v3 + Commons Clause
+  - Commercial use requires explicit written permission from the Licensor
+  - Contact the Licensor for commercial licensing inquiries
