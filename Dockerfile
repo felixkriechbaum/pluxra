@@ -15,7 +15,7 @@ RUN bun run build
 FROM node:22-alpine AS runner
 WORKDIR /app
 
-COPY --from=builder /app/.output ./output
+COPY --from=builder /app/.output ./
 COPY --from=builder /app/server/db/migrations ./server/db/migrations
 
 ENV NODE_ENV=production
@@ -23,4 +23,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["node", "./output/server/index.mjs"]
+ENTRYPOINT ["node", "server/index.mjs"]
