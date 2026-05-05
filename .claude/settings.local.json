@@ -10,7 +10,10 @@
       "Bash(git push *)",
       "Bash(git commit -m 'chore: simplify docker-compose to app-only, external DB *)",
       "Bash(git commit -m 'feat: auto-run DB migrations on server startup *)",
-      "Bash(git commit -m 'fix: use Node.js runtime instead of Bun to fix jose/jwks-rsa resolution *)"
+      "Bash(git commit -m 'fix: use Node.js runtime instead of Bun to fix jose/jwks-rsa resolution *)",
+      "Bash(ssh zap *)",
+      "Bash(git commit -m 'fix: set nitro preset to node-server for Docker compatibility *)",
+      "Bash(git commit *)"
     ]
   }
 }
