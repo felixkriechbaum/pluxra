@@ -12,7 +12,7 @@ ENV NUXT_PUBLIC_APP_VERSION=$APP_VERSION
 RUN bun run build
 
 # ---- runtime ----
-FROM oven/bun:1-slim AS runner
+FROM node:22-alpine AS runner
 WORKDIR /app
 
 COPY --from=builder /app/.output ./output
@@ -23,4 +23,4 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-CMD ["bun", "run", "./output/server/index.mjs"]
+CMD ["node", "./output/server/index.mjs"]
