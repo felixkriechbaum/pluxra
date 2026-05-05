@@ -3,6 +3,9 @@ import { fileURLToPath, URL } from 'node:url'
 
 export default defineNuxtConfig({
   future: { compatibilityVersion: 4 },
+  nitro: {
+    preset: 'node-server',
+  },
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   css: ['./app/assets/css/main.css'],
