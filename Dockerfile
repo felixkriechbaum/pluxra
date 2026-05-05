@@ -16,6 +16,7 @@ FROM oven/bun:1-slim AS runner
 WORKDIR /app
 
 COPY --from=builder /app/.output ./output
+COPY --from=builder /app/server/db/migrations ./server/db/migrations
 
 ENV NODE_ENV=production
 ENV PORT=3000
