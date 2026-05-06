@@ -1,6 +1,6 @@
 <template>
   <header class="flex items-end px-2 gap-2 bg-muted/40 border-b border-border">
-    <nav class="flex items-end gap-0.5 flex-1 overflow-x-auto pt-2">
+    <nav class="flex items-end gap-0.5 flex-1 overflow-x-auto scrollbar-hide pt-2">
       <button
         v-for="tab in tabs"
         :key="tab.id"
