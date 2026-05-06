@@ -36,6 +36,7 @@ const { t } = useLocale()
 
 const navItems = computed(() => [
   { to: '/settings/tokens', label: t('tokens') },
+  { to: '/settings/push', label: t('pushSetup') },
   { to: '/settings/language', label: t('language') },
 ])
 </script>

@@ -14,6 +14,7 @@ const translations = {
     settings: 'Einstellungen',
     tokens: 'Tokens',
     language: 'Sprache',
+    pushSetup: 'Push-Einrichtung',
     backToDashboard: '← Dashboard',
   },
   en: {
@@ -31,6 +32,7 @@ const translations = {
     settings: 'Settings',
     tokens: 'Tokens',
     language: 'Language',
+    pushSetup: 'Push Setup',
     backToDashboard: '← Dashboard',
   },
 } as const
