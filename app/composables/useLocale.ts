@@ -38,9 +38,9 @@ const translations = {
 type Locale = keyof typeof translations
 type TranslationKey = keyof typeof translations.de
 
-const _locale = useState<Locale>('locale', () => 'de')
-
 export function useLocale() {
+  const _locale = useState<Locale>('locale', () => 'de')
+
   if (import.meta.client && !_locale.value) {
     const saved = localStorage.getItem('locale') as Locale | null
     if (saved && saved in translations) _locale.value = saved
