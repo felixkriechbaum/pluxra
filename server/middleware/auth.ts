@@ -6,6 +6,10 @@ export default defineEventHandler(async (event) => {
   // Ingest endpoint uses its own token auth
   if (url.pathname.startsWith('/api/ingest/')) return
 
+  // Public proxy endpoints — no user context needed
+  if (url.pathname === '/api/weather') return
+  if (url.pathname === '/api/rss') return
+
   // Only guard API routes
   if (!url.pathname.startsWith('/api/')) return
 

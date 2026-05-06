@@ -1,5 +1,5 @@
 <template>
-  <header class="flex items-stretch px-2 gap-2 bg-muted/40 border-b border-border min-h-10">
+  <header class="flex items-end px-2 gap-2 bg-muted/40 border-b border-border">
     <nav class="flex items-end gap-0.5 flex-1 overflow-x-auto scrollbar-hide pt-2">
       <button
         v-for="tab in tabs"
@@ -18,10 +18,10 @@
         class="flex items-center justify-center px-2 py-1.5 rounded-t-md border-l border-t border-r border-transparent -mb-px text-muted-foreground hover:text-foreground transition-colors"
         @click="emit('addTab')"
       >
-        <Plus class="h-3.5 w-3.5" />
+        <Plus class="h-5 w-5" />
       </button>
     </nav>
-    <div class="flex items-center gap-1 shrink-0">
+    <div class="flex items-center gap-1 pb-1.5 shrink-0">
       <button
         class="px-3 py-1 text-xs rounded border border-border hover:bg-accent transition-colors"
         @click="toggleEditMode"

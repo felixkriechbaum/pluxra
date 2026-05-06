@@ -24,6 +24,22 @@
         </div>
       </div>
 
+      <!-- Shadow — available for all widgets -->
+      <div class="py-4 border-b">
+        <p class="text-xs text-muted-foreground font-medium mb-2">Shadow</p>
+        <div class="flex gap-2">
+          <button
+            v-for="opt in shadowOptions"
+            :key="opt.value"
+            class="flex-1 py-1 text-xs rounded border transition-colors"
+            :class="(localConfig.shadow ?? 'none') === opt.value ? 'bg-primary text-primary-foreground border-primary' : 'hover:bg-accent border-border'"
+            @click="localConfig.shadow = opt.value"
+          >
+            {{ opt.label }}
+          </button>
+        </div>
+      </div>
+
       <component :is="settingsComponent" v-if="settingsComponent" v-model="localConfig" class="py-4" />
       <p v-else class="py-4 text-sm text-muted-foreground">Dieses Widget hat keine weiteren Einstellungen.</p>
 
@@ -60,7 +76,15 @@ const settingsComponent = computed(() => {
   catch { return null }
 })
 
-const localConfig = ref<Record<string, unknown>>({ ...props.config })
+const localConfig = ref<Record<string, unknown>>({ shadow: 'none', ...props.config })
+
+const shadowOptions = [
+  { value: 'none', label: 'Kein' },
+  { value: 'sm',   label: 'Klein' },
+  { value: 'md',   label: 'Mittel' },
+  { value: 'lg',   label: 'Groß' },
+  { value: 'xl',   label: 'Sehr groß' },
+]
 const pos = ref({ colSpan: props.colSpan, rowSpan: props.rowSpan })
 
 watch(() => props.config, c => { localConfig.value = { ...c } })

@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative overflow-hidden rounded-lg border bg-card transition-opacity duration-150"
-    :class="[editMode ? 'cursor-grab' : '', dimmed ? 'opacity-30' : 'opacity-100']"
+    :class="[editMode ? 'cursor-grab' : '', dimmed ? 'opacity-30' : 'opacity-100', shadowClass]"
     :style="{
       gridColumn: `${widget.colStart} / span ${widget.colSpan}`,
       gridRow: `${widget.rowStart} / span ${widget.rowSpan}`,
@@ -41,6 +41,18 @@ const emit = defineEmits<{
 
 const { editMode } = useGrid()
 const pluginComponent = computed(() => getWidget(props.widget.pluginId).component)
+
+const shadowMap: Record<string, string> = {
+  none: '',
+  sm: 'shadow-sm',
+  md: 'shadow-md',
+  lg: 'shadow-lg',
+  xl: 'shadow-xl',
+}
+const shadowClass = computed(() => {
+  const s = props.widget.config.shadow as string | undefined
+  return shadowMap[s ?? 'none'] ?? ''
+})
 
 function onMouseDown(e: MouseEvent) {
   if (!editMode.value) return
