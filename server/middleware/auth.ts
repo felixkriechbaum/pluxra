@@ -13,12 +13,16 @@ export default defineEventHandler(async (event) => {
   // Only guard API routes
   if (!url.pathname.startsWith('/api/')) return
 
+  // EventSource can't set headers — allow token as query param for SSE
+  const queryToken = getQuery(event).token as string | undefined
   const authorization = getHeader(event, 'authorization')
-  if (!authorization?.startsWith('Bearer ')) {
+  const rawToken = queryToken ?? (authorization?.startsWith('Bearer ') ? authorization.slice(7) : null)
+
+  if (!rawToken) {
     throw createError({ statusCode: 401, message: 'Missing Bearer token' })
   }
 
-  const idToken = authorization.slice(7)
+  const idToken = rawToken
   try {
     const decoded = await useFirebaseAdmin().verifyIdToken(idToken)
     event.context.uid = decoded.uid

@@ -12,6 +12,8 @@ export const serverStatsPlugin: WidgetPlugin = {
     defaultSize: { colSpan: 3, rowSpan: 2 },
     configSchema: z.object({
       title: z.string().default('Server'),
+      showChart: z.boolean().default(true),
+      keys: z.array(z.string()).default([]),
     }),
   },
   component,
