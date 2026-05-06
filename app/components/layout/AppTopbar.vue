@@ -15,10 +15,10 @@
         {{ tab.title }}
       </button>
       <button
-        class="flex items-center justify-center self-center px-2 py-1 text-sm leading-none rounded text-muted-foreground hover:text-foreground transition-colors"
+        class="flex items-center justify-center px-2 py-1.5 rounded-t-md border-t border-transparent -mb-px text-muted-foreground hover:text-foreground transition-colors"
         @click="emit('addTab')"
       >
-        +
+        <Plus class="h-3.5 w-3.5" />
       </button>
     </nav>
     <div class="flex items-center gap-1 pb-1.5 shrink-0">
@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { Settings } from 'lucide-vue-next'
+import { Settings, Plus } from 'lucide-vue-next'
 
 defineProps<{
   tabs: { id: string; title: string }[]
