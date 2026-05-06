@@ -29,6 +29,7 @@
       @dragstart="onTileDragStart"
       @delete="emit('delete', $event)"
       @settings="emit('settings', $event)"
+      @duplicate="emit('duplicate', $event)"
     />
 
     <!-- Drop ghost -->
@@ -74,6 +75,7 @@ const props = defineProps<{ widgets: Widget[]; cols: number; rows: number }>()
 const emit = defineEmits<{
   delete: [id: string]
   settings: [id: string]
+  duplicate: [id: string]
   move: [widgetId: string, position: { colStart: number; rowStart: number }]
 }>()
 

@@ -14,6 +14,7 @@
       :widget-id="widget.id"
       @delete="emit('delete', widget.id)"
       @settings="emit('settings', widget.id)"
+      @duplicate="emit('duplicate', widget.id)"
     />
   </div>
 </template>
@@ -36,6 +37,7 @@ const props = defineProps<{ widget: Widget; dimmed?: boolean }>()
 const emit = defineEmits<{
   delete: [id: string]
   settings: [id: string]
+  duplicate: [id: string]
   dragstart: [widgetId: string, colSpan: number, rowSpan: number, event: MouseEvent]
 }>()
 

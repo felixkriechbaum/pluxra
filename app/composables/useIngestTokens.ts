@@ -1,24 +1,28 @@
 export function useIngestTokens() {
-  const { getIdToken } = useUser()
+  const { idToken, getIdToken } = useUser()
 
   async function authHeaders() {
     const token = await getIdToken()
     return { Authorization: `Bearer ${token}` }
   }
 
-  const { data: tokens, refresh } = useFetch('/api/ingest-tokens', { headers: authHeaders })
+  const { data: tokens, refresh } = useFetch('/api/ingest-tokens', {
+    headers: computed(() => idToken.value ? { Authorization: `Bearer ${idToken.value}` } : {}),
+    watch: [idToken],
+  })
 
-  const newTokenRaw = ref<string | null>(null)
-
-  async function createToken(widgetId: string, label: string, lifetimeMs: number) {
+  async function createToken(widgetIds: string[], label: string, lifetimeMs: number) {
     const headers = await authHeaders()
-    const result = await $fetch<{ id: string; rawToken: string; label: string; expiresAt: string }>(
-      '/api/ingest-tokens',
-      { method: 'POST', headers, body: { widgetId, label, lifetimeMs } },
-    )
-    newTokenRaw.value = result.rawToken
+    await $fetch('/api/ingest-tokens', {
+      method: 'POST', headers, body: { widgetIds, label, lifetimeMs },
+    })
     await refresh()
-    return result
+  }
+
+  async function updateTokenWidgets(id: string, widgetIds: string[]) {
+    const headers = await authHeaders()
+    await $fetch(`/api/ingest-tokens/${id}`, { method: 'PATCH', headers, body: { widgetIds } })
+    await refresh()
   }
 
   async function deleteToken(id: string) {
@@ -27,7 +31,5 @@ export function useIngestTokens() {
     await refresh()
   }
 
-  function clearNewToken() { newTokenRaw.value = null }
-
-  return { tokens, createToken, deleteToken, newTokenRaw: readonly(newTokenRaw), clearNewToken, refresh }
+  return { tokens, createToken, updateTokenWidgets, deleteToken, refresh }
 }

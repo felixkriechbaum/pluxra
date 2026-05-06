@@ -28,6 +28,7 @@
         :rows="gridRows"
         @delete="deleteWidget"
         @settings="openSettings"
+        @duplicate="duplicateWidget"
         @move="onMove"
       />
       <div v-else-if="!editMode" class="flex items-center justify-center h-full text-muted-foreground text-sm">
@@ -42,7 +43,7 @@
       </button>
     </div>
 
-    <WidgetPicker v-model:open="showPicker" @select="onPickWidget" />
+    <WidgetPicker v-model:open="showPicker" @select="onPickWidget" @select-template="onPickTemplate" />
     <WidgetSettings
       v-if="settingsTarget"
       :open="showSettings"
@@ -89,6 +90,20 @@ async function onMove(widgetId: string, position: { colStart: number; rowStart: 
   await updateWidget(widgetId, position)
 }
 
+async function duplicateWidget(id: string) {
+  const w = (widgets.value as any[])?.find((x: any) => x.id === id)
+  if (!w) return
+  await createWidget({
+    tabId: tabId.value,
+    pluginId: w.pluginId,
+    colStart: Math.min(w.colStart + 1, gridCols.value),
+    colSpan: w.colSpan,
+    rowStart: Math.min(w.rowStart + 1, gridRows.value),
+    rowSpan: w.rowSpan,
+    config: { ...w.config },
+  })
+}
+
 async function onPickWidget(pluginId: string) {
   const plugin = getWidget(pluginId)
   await createWidget({
@@ -99,6 +114,19 @@ async function onPickWidget(pluginId: string) {
     rowStart: 1,
     rowSpan: plugin.manifest.defaultSize.rowSpan,
     config: plugin.manifest.configSchema.parse({}),
+  })
+}
+
+async function onPickTemplate(_templateId: string, config: Record<string, unknown>) {
+  const plugin = getWidget('custom')
+  await createWidget({
+    tabId: tabId.value,
+    pluginId: 'custom',
+    colStart: 1,
+    colSpan: plugin.manifest.defaultSize.colSpan,
+    rowStart: 1,
+    rowSpan: plugin.manifest.defaultSize.rowSpan,
+    config,
   })
 }
 

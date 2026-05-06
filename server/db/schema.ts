@@ -1,4 +1,4 @@
-import { mysqlTable, varchar, int, json, datetime } from 'drizzle-orm/mysql-core'
+import { mysqlTable, varchar, int, json, datetime, primaryKey } from 'drizzle-orm/mysql-core'
 
 export const users = mysqlTable('users', {
   id: varchar('id', { length: 128 }).primaryKey(),
@@ -43,6 +43,20 @@ export const ingestTokens = mysqlTable('ingest_tokens', {
   expiresAt: datetime('expires_at').notNull(),
   lastUsedAt: datetime('last_used_at'),
 })
+
+export const widgetTemplates = mysqlTable('widget_templates', {
+  id: varchar('id', { length: 36 }).primaryKey(),
+  userId: varchar('user_id', { length: 128 }).notNull().references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  icon: varchar('icon', { length: 50 }).notNull().default('puzzle'),
+  color: varchar('color', { length: 20 }).notNull().default('#6366f1'),
+  config: json('config').notNull().default({}),
+})
+
+export const ingestTokenWidgets = mysqlTable('ingest_token_widgets', {
+  tokenId: varchar('token_id', { length: 36 }).notNull().references(() => ingestTokens.id, { onDelete: 'cascade' }),
+  widgetId: varchar('widget_id', { length: 36 }).notNull().references(() => widgets.id, { onDelete: 'cascade' }),
+}, t => ({ pk: primaryKey({ columns: [t.tokenId, t.widgetId] }) }))
 
 export const ingestData = mysqlTable('ingest_data', {
   id: varchar('id', { length: 36 }).primaryKey(),

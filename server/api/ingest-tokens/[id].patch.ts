@@ -2,34 +2,29 @@ import { useDb } from '../../utils/db'
 import { ingestTokens, ingestTokenWidgets, widgets } from '../../db/schema'
 import { eq, and, inArray } from 'drizzle-orm'
 import { z } from 'zod'
-import { randomUUID } from 'uncrypto'
-import bcrypt from 'bcryptjs'
-
-const MAX_LIFETIME_MS = 365 * 24 * 60 * 60 * 1000
 
 const bodySchema = z.object({
   widgetIds: z.array(z.string().uuid()).min(1),
-  label: z.string().min(1).max(255),
-  lifetimeMs: z.number().int().min(3_600_000).max(MAX_LIFETIME_MS),
 })
 
 export default defineEventHandler(async (event) => {
   const uid = event.context.uid as string
+  const id = getRouterParam(event, 'id')!
   const body = await readValidatedBody(event, bodySchema.parse)
   const db = useDb()
+
+  const [token] = await db.select({ id: ingestTokens.id })
+    .from(ingestTokens)
+    .where(and(eq(ingestTokens.id, id), eq(ingestTokens.userId, uid)))
+  if (!token) throw createError({ statusCode: 404, message: 'Not found' })
 
   const owned = await db.select({ id: widgets.id }).from(widgets)
     .where(and(inArray(widgets.id, body.widgetIds), eq(widgets.userId, uid)))
   if (owned.length !== body.widgetIds.length)
     throw createError({ statusCode: 403, message: 'Forbidden' })
 
-  const rawToken = randomUUID()
-  const tokenHash = await bcrypt.hash(rawToken, 10)
-  const expiresAt = new Date(Date.now() + body.lifetimeMs)
-  const id = randomUUID()
-
-  await db.insert(ingestTokens).values({ id, userId: uid, widgetId: body.widgetIds[0], tokenHash, label: body.label, expiresAt })
+  await db.delete(ingestTokenWidgets).where(eq(ingestTokenWidgets.tokenId, id))
   await db.insert(ingestTokenWidgets).values(body.widgetIds.map(wid => ({ tokenId: id, widgetId: wid })))
 
-  return { id, rawToken, label: body.label, expiresAt }
+  return { ok: true }
 })

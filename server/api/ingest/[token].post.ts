@@ -1,5 +1,5 @@
 import { useDb } from '../../utils/db'
-import { ingestTokens, ingestData } from '../../db/schema'
+import { ingestTokens, ingestTokenWidgets, ingestData } from '../../db/schema'
 import { eq } from 'drizzle-orm'
 import { useIngestEmitter } from '../../utils/ingest-emitter'
 import bcrypt from 'bcryptjs'
@@ -15,7 +15,6 @@ export default defineEventHandler(async (event) => {
     allTokens.map(async t => ({ t, ok: await bcrypt.compare(rawToken, t.tokenHash) })),
   )
   const matched = matchResults.find(r => r.ok)
-
   if (!matched) throw createError({ statusCode: 401, message: 'Invalid token' })
 
   const token = matched.t
@@ -23,12 +22,23 @@ export default defineEventHandler(async (event) => {
     throw createError({ statusCode: 401, message: 'Token expired' })
   }
 
-  const id = randomUUID()
   const createdAt = new Date()
-  await db.insert(ingestData).values({ id, widgetId: token.widgetId, tokenId: token.id, payload, createdAt })
   await db.update(ingestTokens).set({ lastUsedAt: createdAt }).where(eq(ingestTokens.id, token.id))
 
-  useIngestEmitter().emit(`widget:${token.widgetId}`, payload)
+  // Fire to all linked widgets
+  const links = await db.select().from(ingestTokenWidgets).where(eq(ingestTokenWidgets.tokenId, token.id))
+  await Promise.all(links.map(async (link) => {
+    const id = randomUUID()
+    await db.insert(ingestData).values({ id, widgetId: link.widgetId, tokenId: token.id, payload, createdAt })
+    useIngestEmitter().emit(`widget:${link.widgetId}`, payload)
+  }))
+
+  // Fallback: still support old widgetId column if no links exist
+  if (!links.length && token.widgetId) {
+    const id = randomUUID()
+    await db.insert(ingestData).values({ id, widgetId: token.widgetId, tokenId: token.id, payload, createdAt })
+    useIngestEmitter().emit(`widget:${token.widgetId}`, payload)
+  }
 
   return { ok: true }
 })

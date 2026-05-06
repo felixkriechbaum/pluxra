@@ -5,6 +5,7 @@ import { nasStatsPlugin } from './nas-stats'
 import { iframePlugin } from './iframe'
 import { weatherPlugin } from './weather'
 import { rssPlugin } from './rss'
+import { customPlugin } from './custom'
 
 export const widgetRegistry: Record<string, WidgetPlugin> = {
   bookmarks: bookmarksPlugin,
@@ -13,6 +14,7 @@ export const widgetRegistry: Record<string, WidgetPlugin> = {
   iframe: iframePlugin,
   weather: weatherPlugin,
   rss: rssPlugin,
+  custom: customPlugin,
 }
 
 export function getWidget(id: string): WidgetPlugin {
