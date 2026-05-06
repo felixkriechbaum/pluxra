@@ -15,7 +15,7 @@
         {{ tab.title }}
       </button>
       <button
-        class="flex items-center justify-center px-2 py-1.5 text-sm leading-none rounded-t-md -mb-px text-muted-foreground hover:text-foreground transition-colors"
+        class="flex items-center justify-center self-center px-2 py-1 text-sm leading-none rounded text-muted-foreground hover:text-foreground transition-colors"
         @click="emit('addTab')"
       >
         +
