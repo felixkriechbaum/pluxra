@@ -20,8 +20,7 @@ export default defineEventHandler(async (event) => {
     event.context.uid = decoded.uid
     event.context.email = decoded.email ?? ''
   }
-  catch (err) {
-    console.error('[auth] verifyIdToken failed:', err)
+  catch {
     throw createError({ statusCode: 401, message: 'Invalid or expired token' })
   }
 })
