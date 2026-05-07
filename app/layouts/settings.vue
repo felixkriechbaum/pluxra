@@ -38,6 +38,6 @@ const navItems = computed(() => [
   { to: '/settings/tokens', label: t('tokens') },
   { to: '/settings/widgets', label: t('myWidgets') },
   { to: '/settings/push', label: t('pushSetup') },
-  { to: '/settings/language', label: t('language') },
+  { to: '/settings/appearance', label: 'Appearance' },
 ])
 </script>

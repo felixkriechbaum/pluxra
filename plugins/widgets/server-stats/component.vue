@@ -16,13 +16,13 @@
         <div v-for="key in visibleKeys" :key="key" class="space-y-0.5">
           <div class="flex justify-between text-[10px]">
             <span class="text-muted-foreground uppercase tracking-wide">{{ key }}</span>
-            <span class="font-mono font-medium">{{ currentData[key] }}%</span>
+            <span class="font-mono font-medium">{{ currentData[key] }}{{ props.config.yAxisSuffix ?? '%' }}</span>
           </div>
           <div class="h-1.5 rounded-full bg-muted overflow-hidden">
             <div
               class="h-full rounded-full transition-all duration-500"
               :class="barColor(currentData[key])"
-              :style="{ width: `${Math.min(100, currentData[key])}%` }"
+              :style="{ width: `${Math.min(100, Math.max(0, ((currentData[key] - (props.config.yAxisMin ?? 0)) / ((props.config.yAxisMax ?? 100) - (props.config.yAxisMin ?? 0))) * 100))}%` }"
             />
           </div>
         </div>
@@ -41,7 +41,7 @@ import { Chart, LineController, LineElement, PointElement, LinearScale, Category
 Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Filler, Tooltip)
 
 const props = defineProps<{
-  config: { title: string; showChart?: boolean; keys?: string[] }
+  config: { title: string; showChart?: boolean; keys?: string[]; yAxisSuffix?: string; yAxisMin?: number; yAxisMax?: number }
   widgetId: string
 }>()
 
@@ -129,9 +129,10 @@ function buildChart() {
       scales: {
         x: { grid: { display: false }, ticks: { font: { size: 9 }, maxTicksLimit: 5, color: '#888' } },
         y: {
-          min: 0, max: 100,
+          min: props.config.yAxisMin ?? 0,
+          max: props.config.yAxisMax ?? 100,
           grid: { color: 'rgba(128,128,128,0.15)' },
-          ticks: { font: { size: 9 }, stepSize: 25, color: '#888', callback: (v) => `${v}%` },
+          ticks: { font: { size: 9 }, color: '#888', callback: (v) => `${v}${props.config.yAxisSuffix ?? '%'}` },
         },
       },
     },

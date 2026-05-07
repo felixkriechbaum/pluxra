@@ -12,6 +12,9 @@ export const nasStatsPlugin: WidgetPlugin = {
     defaultSize: { colSpan: 3, rowSpan: 2 },
     configSchema: z.object({
       title: z.string().default('NAS'),
+      yAxisSuffix: z.string().default('%'),
+      yAxisMin: z.number().default(0),
+      yAxisMax: z.number().default(100),
     }),
   },
   component,

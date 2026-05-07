@@ -6,20 +6,20 @@
 
       <!-- Row 1: icon + city + temp + min/max + stats -->
       <div class="flex flex-row items-center justify-center gap-3 flex-wrap">
-        <span :class="s.icon">{{ weatherIcon(weather.code) }}</span>
+        <span :style="{ fontSize: iconSize }">{{ weatherIcon(weather.code) }}</span>
         <div class="flex flex-col items-center">
-          <span :class="[s.city, 'font-semibold tracking-tight']">{{ weather.city }}</span>
-          <span :class="[s.temp, 'font-bold tracking-tighter leading-none']">{{ weather.temp }}°{{ unitSuffix }}</span>
-          <span :class="[s.small, 'text-muted-foreground']">{{ weather.tempMin }}° / {{ weather.tempMax }}°</span>
+          <span class="font-semibold tracking-tight" :style="{ fontSize: citySize }">{{ weather.city }}</span>
+          <span class="font-bold tracking-tighter leading-none" :style="{ fontSize: tempSize }">{{ weather.temp }}°{{ unitSuffix }}</span>
+          <span class="text-muted-foreground" :style="{ fontSize: smallSize }">{{ weather.tempMin }}° / {{ weather.tempMax }}°</span>
         </div>
-        <div class="flex flex-col gap-0.5" :class="s.small">
+        <div class="flex flex-col gap-0.5" :style="{ fontSize: smallSize }">
           <span v-if="config.showHumidity !== false" class="text-muted-foreground">💧 {{ weather.humidity }}%</span>
           <span v-if="config.showWind !== false" class="text-muted-foreground">💨 {{ weather.windCurrent }} {{ windUnit }}</span>
           <span v-if="config.showWindDetail" class="text-muted-foreground">↓{{ weather.windMin }} ↑{{ weather.windMax }} {{ windUnit }}</span>
         </div>
       </div>
 
-      <!-- Row 2: hourly forecast — horizontal normally, vertical when small -->
+      <!-- Row 2: hourly forecast -->
       <div
         v-if="config.showHourly !== false && weather.hourly?.length && size !== 'xs'"
         class="flex gap-2 overflow-x-auto scrollbar-hide w-full justify-center"
@@ -31,9 +31,9 @@
           class="flex items-center gap-1 shrink-0"
           :class="size === 'sm' ? 'flex-row' : 'flex-col'"
         >
-          <span :class="[s.small, 'text-muted-foreground']">{{ h.hour }}</span>
-          <span :class="s.hourlyIcon">{{ weatherIcon(h.code) }}</span>
-          <span :class="[s.small, 'font-medium']">{{ h.temp }}°</span>
+          <span class="text-muted-foreground" :style="{ fontSize: smallSize }">{{ h.hour }}</span>
+          <span :style="{ fontSize: hourlyIconSize }">{{ weatherIcon(h.code) }}</span>
+          <span class="font-medium" :style="{ fontSize: smallSize }">{{ h.temp }}°</span>
         </div>
       </div>
 
@@ -81,21 +81,30 @@ onMounted(() => {
 })
 
 const size = computed(() => {
-  const min = Math.min(width.value, height.value)
-  if (min < 100) return 'xs'
-  if (min < 160) return 'sm'
-  if (min < 240) return 'md'
-  if (min < 340) return 'lg'
+  const w = width.value
+  const h = height.value
+  const dim = h < 160 ? Math.min(w, h) : w
+  if (dim < 200) return 'xs'
+  if (dim < 320) return 'sm'
+  if (dim < 500) return 'md'
+  if (dim < 700) return 'lg'
   return 'xl'
 })
 
-const s = computed(() => ({
-  xs: { icon: 'text-lg',   city: 'text-[10px]', temp: 'text-2xl', small: 'text-[9px]',  hourlyIcon: 'text-xs'  },
-  sm: { icon: 'text-2xl',  city: 'text-xs',     temp: 'text-3xl', small: 'text-[10px]', hourlyIcon: 'text-sm'  },
-  md: { icon: 'text-3xl',  city: 'text-sm',     temp: 'text-4xl', small: 'text-xs',     hourlyIcon: 'text-base' },
-  lg: { icon: 'text-4xl',  city: 'text-base',   temp: 'text-5xl', small: 'text-sm',     hourlyIcon: 'text-lg'  },
-  xl: { icon: 'text-5xl',  city: 'text-lg',     temp: 'text-7xl', small: 'text-base',   hourlyIcon: 'text-xl'  },
-}[size.value]))
+// Inline styles so Tailwind purging is never an issue
+const scales = {
+  xs: { icon: '2rem',   city: '0.65rem', temp: '1.5rem',  small: '0.6rem',  hourlyIcon: '1.1rem' },
+  sm: { icon: '2.75rem', city: '0.75rem', temp: '2rem',    small: '0.7rem',  hourlyIcon: '1.4rem' },
+  md: { icon: '4rem',   city: '0.9rem',  temp: '2.75rem', small: '0.8rem',  hourlyIcon: '1.8rem' },
+  lg: { icon: '5.5rem', city: '1.1rem',  temp: '4rem',    small: '0.95rem', hourlyIcon: '2.2rem' },
+  xl: { icon: '8rem',   city: '1.4rem',  temp: '6rem',    small: '1.1rem',  hourlyIcon: '3rem'   },
+}
+
+const iconSize       = computed(() => scales[size.value].icon)
+const citySize       = computed(() => scales[size.value].city)
+const tempSize       = computed(() => scales[size.value].temp)
+const smallSize      = computed(() => scales[size.value].small)
+const hourlyIconSize = computed(() => scales[size.value].hourlyIcon)
 
 function weatherIcon(code: number): string {
   if (code === 0) return '☀️'
