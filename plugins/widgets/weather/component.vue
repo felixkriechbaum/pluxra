@@ -4,36 +4,45 @@
     <p v-else-if="error" class="text-xs text-destructive">{{ (error as any).data?.message || (error as any).message }}</p>
     <template v-else-if="weather">
 
-      <!-- Row 1: icon + city + temp + min/max + stats -->
-      <div class="flex flex-row items-center justify-center gap-3 flex-wrap">
-        <span :style="{ fontSize: iconSize }">{{ weatherIcon(weather.code) }}</span>
-        <div class="flex flex-col items-center">
-          <span class="font-semibold tracking-tight" :style="{ fontSize: citySize }">{{ weather.city }}</span>
-          <span class="font-bold tracking-tighter leading-none" :style="{ fontSize: tempSize }">{{ weather.temp }}°{{ unitSuffix }}</span>
-          <span class="text-muted-foreground" :style="{ fontSize: smallSize }">{{ weather.tempMin }}° / {{ weather.tempMax }}°</span>
-        </div>
-        <div class="flex flex-col gap-0.5" :style="{ fontSize: smallSize }">
-          <span v-if="config.showHumidity !== false" class="text-muted-foreground">💧 {{ weather.humidity }}%</span>
-          <span v-if="config.showWind !== false" class="text-muted-foreground">💨 {{ weather.windCurrent }} {{ windUnit }}</span>
-          <span v-if="config.showWindDetail" class="text-muted-foreground">↓{{ weather.windMin }} ↑{{ weather.windMax }} {{ windUnit }}</span>
-        </div>
-      </div>
-
-      <!-- Row 2: hourly forecast -->
+      <!-- Main content: horizontal or vertical based on aspect ratio -->
       <div
-        v-if="config.showHourly !== false && weather.hourly?.length && size !== 'xs'"
-        class="flex gap-2 overflow-x-auto scrollbar-hide w-full justify-center"
-        :class="size === 'sm' ? 'flex-col items-center' : 'flex-row'"
+        class="flex items-center justify-center gap-4 flex-1 min-h-0 min-w-0 w-full"
+        :style="{ flexDirection: isHorizontal ? 'row' : 'column' }"
       >
-        <div
-          v-for="h in weather.hourly"
-          :key="h.hour"
-          class="flex items-center gap-1 shrink-0"
-          :class="size === 'sm' ? 'flex-row' : 'flex-col'"
-        >
-          <span class="text-muted-foreground" :style="{ fontSize: smallSize }">{{ h.hour }}</span>
-          <span :style="{ fontSize: hourlyIconSize }">{{ weatherIcon(h.code) }}</span>
-          <span class="font-medium" :style="{ fontSize: smallSize }">{{ h.temp }}°</span>
+        <!-- Icon + temp block -->
+        <div class="flex items-center gap-3 shrink-0">
+          <span :style="{ fontSize: sz.icon }">{{ weatherIcon(weather.code) }}</span>
+          <div class="flex flex-col" :style="{ alignItems: isHorizontal ? 'flex-start' : 'center' }">
+            <span class="font-semibold tracking-tight" :style="{ fontSize: sz.city }">{{ weather.city }}</span>
+            <span class="font-bold tracking-tighter leading-none" :style="{ fontSize: sz.temp }">{{ weather.temp }}°{{ unitSuffix }}</span>
+            <span class="text-muted-foreground" :style="{ fontSize: sz.small }">{{ weather.tempMin }}° / {{ weather.tempMax }}°</span>
+          </div>
+        </div>
+
+        <!-- Stats + hourly -->
+        <div class="flex flex-col gap-1 min-w-0">
+          <div class="flex gap-3 flex-wrap" :style="{ fontSize: sz.small, justifyContent: isHorizontal ? 'flex-start' : 'center' }">
+            <span v-if="config.showHumidity !== false" class="text-muted-foreground">💧 {{ weather.humidity }}%</span>
+            <span v-if="config.showWind !== false" class="text-muted-foreground">💨 {{ weather.windCurrent }} {{ windUnit }}</span>
+            <span v-if="config.showWindDetail" class="text-muted-foreground">↓{{ weather.windMin }} ↑{{ weather.windMax }} {{ windUnit }}</span>
+          </div>
+
+          <div
+            v-if="config.showHourly !== false && weather.hourly?.length && scale > 0.5"
+            class="flex gap-3 scrollbar-hide"
+            :style="{ flexDirection: isHorizontal ? 'row' : 'column', alignItems: 'center', overflowX: isHorizontal ? 'auto' : 'visible', overflowY: isHorizontal ? 'visible' : 'auto' }"
+          >
+            <div
+              v-for="h in weather.hourly"
+              :key="h.hour"
+              class="flex items-center gap-0.5 shrink-0"
+              :style="{ flexDirection: isHorizontal ? 'column' : 'row' }"
+            >
+              <span class="text-muted-foreground" :style="{ fontSize: sz.small }">{{ h.hour }}</span>
+              <span :style="{ fontSize: sz.hourlyIcon }">{{ weatherIcon(h.code) }}</span>
+              <span class="font-medium" :style="{ fontSize: sz.small }">{{ h.temp }}°</span>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -72,39 +81,34 @@ const width = ref(0)
 const height = ref(0)
 
 onMounted(() => {
+  const el = containerEl.value
+  if (!el) return
   const ro = new ResizeObserver(([entry]) => {
     width.value = entry.contentRect.width
     height.value = entry.contentRect.height
   })
-  if (containerEl.value) ro.observe(containerEl.value)
+  ro.observe(el.parentElement ?? el)
   onUnmounted(() => ro.disconnect())
 })
 
-const size = computed(() => {
-  const w = width.value
-  const h = height.value
-  const dim = h < 160 ? Math.min(w, h) : w
-  if (dim < 200) return 'xs'
-  if (dim < 320) return 'sm'
-  if (dim < 500) return 'md'
-  if (dim < 700) return 'lg'
-  return 'xl'
+const isHorizontal = computed(() => width.value >= height.value)
+const scale = computed(() => {
+  // use the smaller dimension so content never overflows either axis
+  const constraining = Math.min(width.value, height.value)
+  return Math.max(0.3, Math.min(3, constraining / 200))
 })
 
-// Inline styles so Tailwind purging is never an issue
-const scales = {
-  xs: { icon: '2rem',   city: '0.65rem', temp: '1.5rem',  small: '0.6rem',  hourlyIcon: '1.1rem' },
-  sm: { icon: '2.75rem', city: '0.75rem', temp: '2rem',    small: '0.7rem',  hourlyIcon: '1.4rem' },
-  md: { icon: '4rem',   city: '0.9rem',  temp: '2.75rem', small: '0.8rem',  hourlyIcon: '1.8rem' },
-  lg: { icon: '5.5rem', city: '1.1rem',  temp: '4rem',    small: '0.95rem', hourlyIcon: '2.2rem' },
-  xl: { icon: '8rem',   city: '1.4rem',  temp: '6rem',    small: '1.1rem',  hourlyIcon: '3rem'   },
+function rem(base: number) {
+  return `${(base * scale.value).toFixed(3)}rem`
 }
 
-const iconSize       = computed(() => scales[size.value].icon)
-const citySize       = computed(() => scales[size.value].city)
-const tempSize       = computed(() => scales[size.value].temp)
-const smallSize      = computed(() => scales[size.value].small)
-const hourlyIconSize = computed(() => scales[size.value].hourlyIcon)
+const sz = computed(() => ({
+  icon:       rem(2.2),
+  city:       rem(0.8),
+  temp:       rem(2.2),
+  small:      rem(0.72),
+  hourlyIcon: rem(1.3),
+}))
 
 function weatherIcon(code: number): string {
   if (code === 0) return '☀️'
