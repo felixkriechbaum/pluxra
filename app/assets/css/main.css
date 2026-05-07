@@ -121,6 +121,19 @@
   body {
     @apply bg-background text-foreground;
   }
+  label:has(+ input), label:has(+ select), label:has(+ textarea),
+  [data-slot="label"] {
+    margin-bottom: 4px;
+    display: block;
+  }
+
+  select.select-input {
+    @apply w-full rounded-md border border-input bg-background px-3 text-sm shadow-xs transition-colors;
+    height: 36px;
+    line-height: 36px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
   .scrollbar-hide {
     scrollbar-width: none;
     -ms-overflow-style: none;

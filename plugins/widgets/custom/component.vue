@@ -66,17 +66,35 @@ const { data: historyRaw, refresh } = useFetch<{ payload: Record<string, unknown
   () => `/api/widgets/history?widgetId=${props.widgetId}`,
   { headers: computed(() => idToken.value ? { Authorization: `Bearer ${idToken.value}` } : {}), watch: [idToken], default: () => [] },
 )
-watch(liveData, () => refresh())
+watch(liveData, () => nextTick(() => {
+  props.config.blocks.filter(b => b.type === 'chart').forEach(b => buildChart(b.key))
+}))
 
 // Poll data source
 const pollData = ref<Record<string, unknown> | null>(null)
 let pollTimer: ReturnType<typeof setInterval> | null = null
 
+function parsePollHeaders(raw: string): Record<string, string> {
+  const result: Record<string, string> = {}
+  for (const line of (raw ?? '').split('\n')) {
+    const idx = line.indexOf(':')
+    if (idx < 1) continue
+    result[line.slice(0, idx).trim()] = line.slice(idx + 1).trim()
+  }
+  return result
+}
+
 function startPolling() {
   if (pollTimer) clearInterval(pollTimer)
   if (props.config.dataSource !== 'poll' || !props.config.pollUrl) return
   const load = async () => {
-    try { pollData.value = await $fetch(props.config.pollUrl) }
+    try {
+      pollData.value = await $fetch(props.config.pollUrl, {
+        method: (props.config.pollMethod || 'GET') as any,
+        headers: parsePollHeaders(props.config.pollHeaders),
+        body: props.config.pollBody || undefined,
+      })
+    }
     catch {}
   }
   load()
@@ -85,7 +103,7 @@ function startPolling() {
 
 onMounted(startPolling)
 onUnmounted(() => { if (pollTimer) clearInterval(pollTimer) })
-watch(() => [props.config.dataSource, props.config.pollUrl, props.config.pollInterval], startPolling)
+watch(() => [props.config.dataSource, props.config.pollUrl, props.config.pollInterval, props.config.pollHeaders, props.config.pollBody, props.config.pollMethod], startPolling)
 
 const currentData = computed<Record<string, unknown>>(() => {
   if (props.config.dataSource === 'poll') return pollData.value ?? {}

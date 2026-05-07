@@ -6,6 +6,8 @@ import { iframePlugin } from './iframe'
 import { weatherPlugin } from './weather'
 import { rssPlugin } from './rss'
 import { customPlugin } from './custom'
+import { textPlugin } from './text'
+import { searchPlugin } from './search'
 
 export const widgetRegistry: Record<string, WidgetPlugin> = {
   bookmarks: bookmarksPlugin,
@@ -15,6 +17,8 @@ export const widgetRegistry: Record<string, WidgetPlugin> = {
   weather: weatherPlugin,
   rss: rssPlugin,
   custom: customPlugin,
+  text: textPlugin,
+  search: searchPlugin,
 }
 
 export function getWidget(id: string): WidgetPlugin {

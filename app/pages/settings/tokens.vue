@@ -88,7 +88,7 @@
           type="date"
           :min="minDate"
           :max="maxDate"
-          class="w-full border rounded px-2 py-1 text-sm bg-background cursor-pointer"
+          class="select-input cursor-pointer"
         />
       </div>
       <Button :disabled="!form.widgetIds.length || !form.label || !form.expiresOn" @click="onCreate">

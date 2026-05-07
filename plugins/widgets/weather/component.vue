@@ -55,11 +55,12 @@ const props = defineProps<{
     showWind?: boolean
     showWindDetail?: boolean
     showHourly?: boolean
+    hour12?: boolean
   }
 }>()
 
 const { data: weather, error } = useFetch<WeatherData>(
-  () => `/api/weather?city=${encodeURIComponent(props.config.city)}&units=${props.config.units}&provider=${props.config.provider ?? 'open-meteo'}&apiKey=${encodeURIComponent(props.config.apiKey ?? '')}`,
+  () => `/api/weather?city=${encodeURIComponent(props.config.city)}&units=${props.config.units}&provider=${props.config.provider ?? 'open-meteo'}&apiKey=${encodeURIComponent(props.config.apiKey ?? '')}&hour12=${props.config.hour12 ? 'true' : 'false'}`,
   { immediate: !!props.config.city },
 )
 

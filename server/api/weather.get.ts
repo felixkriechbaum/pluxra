@@ -5,6 +5,7 @@ const querySchema = z.object({
   units: z.enum(['metric', 'imperial']).default('metric'),
   provider: z.enum(['open-meteo', 'openweathermap', 'weatherapi']).default('open-meteo'),
   apiKey: z.string().default(''),
+  hour12: z.enum(['true', 'false']).default('false'),
 })
 
 export interface WeatherData {
@@ -21,7 +22,11 @@ export interface WeatherData {
   units: 'metric' | 'imperial'
 }
 
-async function fetchOpenMeteo(city: string, units: 'metric' | 'imperial'): Promise<WeatherData> {
+function fmtHour(date: Date, hour12: boolean) {
+  return date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12 })
+}
+
+async function fetchOpenMeteo(city: string, units: 'metric' | 'imperial', hour12: boolean): Promise<WeatherData> {
   const geoRes = await $fetch<{ results?: { latitude: number; longitude: number; name: string }[] }>(
     `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1`,
   )
@@ -46,7 +51,7 @@ async function fetchOpenMeteo(city: string, units: 'metric' | 'imperial'): Promi
   const currentHourIndex = res.hourly.time.findIndex(t => new Date(t) >= now)
   const startIdx = currentHourIndex < 0 ? 0 : currentHourIndex
   const hourly = res.hourly.time.slice(startIdx, startIdx + 6).map((t, i) => ({
-    hour: new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    hour: fmtHour(new Date(t), hour12),
     temp: Math.round(res.hourly.temperature_2m[startIdx + i]),
     code: res.hourly.weathercode[startIdx + i],
   }))
@@ -67,7 +72,7 @@ async function fetchOpenMeteo(city: string, units: 'metric' | 'imperial'): Promi
   }
 }
 
-async function fetchOpenWeatherMap(city: string, units: 'metric' | 'imperial', apiKey: string): Promise<WeatherData> {
+async function fetchOpenWeatherMap(city: string, units: 'metric' | 'imperial', apiKey: string, hour12: boolean): Promise<WeatherData> {
   if (!apiKey) throw createError({ statusCode: 400, message: 'API key required for OpenWeatherMap' })
 
   const [current, forecast] = await Promise.all([
@@ -81,7 +86,7 @@ async function fetchOpenWeatherMap(city: string, units: 'metric' | 'imperial', a
 
   const winds = forecast.list.map(f => f.wind.speed)
   const hourly = forecast.list.slice(0, 6).map(f => ({
-    hour: new Date(f.dt * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+    hour: fmtHour(new Date(f.dt * 1000), hour12),
     temp: Math.round(f.main.temp),
     code: f.weather[0].id,
   }))
@@ -101,7 +106,7 @@ async function fetchOpenWeatherMap(city: string, units: 'metric' | 'imperial', a
   }
 }
 
-async function fetchWeatherApi(city: string, units: 'metric' | 'imperial', apiKey: string): Promise<WeatherData> {
+async function fetchWeatherApi(city: string, units: 'metric' | 'imperial', apiKey: string, hour12: boolean): Promise<WeatherData> {
   if (!apiKey) throw createError({ statusCode: 400, message: 'API key required for WeatherAPI' })
 
   const res = await $fetch<{
@@ -119,7 +124,7 @@ async function fetchWeatherApi(city: string, units: 'metric' | 'imperial', apiKe
     .filter(h => new Date(h.time) >= now)
     .slice(0, 6)
     .map(h => ({
-      hour: new Date(h.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      hour: fmtHour(new Date(h.time), hour12),
       temp: Math.round(isImperial ? h.temp_f : h.temp_c),
       code: h.condition.code,
     }))
@@ -141,7 +146,8 @@ async function fetchWeatherApi(city: string, units: 'metric' | 'imperial', apiKe
 
 export default defineEventHandler(async (event) => {
   const query = await getValidatedQuery(event, querySchema.parse)
-  if (query.provider === 'openweathermap') return fetchOpenWeatherMap(query.city, query.units, query.apiKey)
-  if (query.provider === 'weatherapi') return fetchWeatherApi(query.city, query.units, query.apiKey)
-  return fetchOpenMeteo(query.city, query.units)
+  const hour12 = query.hour12 === 'true'
+  if (query.provider === 'openweathermap') return fetchOpenWeatherMap(query.city, query.units, query.apiKey, hour12)
+  if (query.provider === 'weatherapi') return fetchWeatherApi(query.city, query.units, query.apiKey, hour12)
+  return fetchOpenMeteo(query.city, query.units, hour12)
 })

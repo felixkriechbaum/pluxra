@@ -16,5 +16,8 @@ export interface CustomConfig {
   dataSource: DataSource
   pollUrl: string
   pollInterval: number
+  pollHeaders: string
+  pollBody: string
+  pollMethod: string
   blocks: Block[]
 }

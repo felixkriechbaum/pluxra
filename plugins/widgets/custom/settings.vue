@@ -10,15 +10,43 @@
       </div>
       <div>
         <Label>Data source</Label>
-        <select v-model="local.dataSource" class="w-full border rounded px-2 py-1 text-sm bg-background">
+        <select v-model="local.dataSource" class="select-input">
           <option value="push">Push (Ingest token)</option>
           <option value="poll">Poll (fetch URL)</option>
         </select>
       </div>
       <template v-if="local.dataSource === 'poll'">
+        <div class="grid grid-cols-4 gap-2">
+          <div class="col-span-1">
+            <Label>Method</Label>
+            <select v-model="local.pollMethod" class="select-input">
+              <option value="GET">GET</option>
+              <option value="POST">POST</option>
+              <option value="PUT">PUT</option>
+            </select>
+          </div>
+          <div class="col-span-3">
+            <Label>URL to fetch</Label>
+            <Input v-model="local.pollUrl" placeholder="https://..." />
+          </div>
+        </div>
         <div>
-          <Label>URL to fetch</Label>
-          <Input v-model="local.pollUrl" placeholder="https://..." />
+          <Label>Headers (one per line, <code>Key: Value</code>)</Label>
+          <textarea
+            v-model="local.pollHeaders"
+            placeholder="Authorization: Bearer token123&#10;X-Api-Key: mykey"
+            rows="3"
+            class="w-full border rounded px-2 py-1 text-sm bg-background font-mono resize-y"
+          />
+        </div>
+        <div>
+          <Label>Body (optional, e.g. JSON)</Label>
+          <textarea
+            v-model="local.pollBody"
+            placeholder='{"key": "value"}'
+            rows="3"
+            class="w-full border rounded px-2 py-1 text-sm bg-background font-mono resize-y"
+          />
         </div>
         <div>
           <Label>Interval (seconds)</Label>
@@ -48,7 +76,7 @@
         <div class="grid grid-cols-2 gap-2">
           <div>
             <Label>Type</Label>
-            <select v-model="block.type" class="w-full border rounded px-2 py-1 text-sm bg-background">
+            <select v-model="block.type" class="select-input">
               <option value="value">Value (large number)</option>
               <option value="bar">Bar (progress)</option>
               <option value="chart">Chart (line graph)</option>
@@ -63,7 +91,7 @@
         <div class="grid grid-cols-3 gap-2">
           <div>
             <Label>Color</Label>
-            <input v-model="block.color" type="color" class="w-full h-8 rounded border cursor-pointer bg-background" />
+            <input v-model="block.color" type="color" class="w-full h-9 rounded border cursor-pointer bg-background" />
           </div>
           <div>
             <Label>Min</Label>
@@ -100,6 +128,9 @@ const local = reactive<CustomConfig>({
   dataSource: 'push',
   pollUrl: '',
   pollInterval: 60,
+  pollHeaders: '',
+  pollBody: '',
+  pollMethod: 'GET',
   blocks: [],
   ...JSON.parse(JSON.stringify(props.modelValue)),
 })

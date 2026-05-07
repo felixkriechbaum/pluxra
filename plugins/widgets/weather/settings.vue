@@ -4,7 +4,7 @@
       <h3 class="text-xs font-medium text-muted-foreground uppercase tracking-wide">Data source</h3>
       <div>
         <Label>Provider</Label>
-        <select v-model="local.provider" class="w-full border rounded px-2 py-1 text-sm bg-background">
+        <select v-model="local.provider" class="select-input">
           <option value="open-meteo">Open-Meteo (free, no key)</option>
           <option value="openweathermap">OpenWeatherMap (free tier)</option>
           <option value="weatherapi">WeatherAPI (free tier)</option>
@@ -20,7 +20,7 @@
       </div>
       <div>
         <Label>Units</Label>
-        <select v-model="local.units" class="w-full border rounded px-2 py-1 text-sm bg-background">
+        <select v-model="local.units" class="select-input">
           <option value="metric">Metric (°C, km/h)</option>
           <option value="imperial">Imperial (°F, mph)</option>
         </select>
@@ -51,6 +51,7 @@ const props = defineProps<{
     showWind?: boolean
     showWindDetail?: boolean
     showHourly?: boolean
+    hour12?: boolean
   }
 }>()
 const emit = defineEmits<{ 'update:modelValue': [v: typeof props.modelValue] }>()
@@ -70,5 +71,6 @@ const toggles = [
   { key: 'showWind' as const, label: 'Current wind' },
   { key: 'showWindDetail' as const, label: 'Wind min/max' },
   { key: 'showHourly' as const, label: 'Hourly forecast' },
+  { key: 'hour12' as const, label: '12-hour clock (AM/PM)' },
 ]
 </script>

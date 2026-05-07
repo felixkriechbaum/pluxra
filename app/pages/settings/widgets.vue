@@ -45,7 +45,7 @@
       <div class="grid grid-cols-2 gap-3">
         <div>
           <Label>Data source</Label>
-          <select v-model="form.config.dataSource" class="w-full border rounded px-2 py-1 text-sm bg-background">
+          <select v-model="form.config.dataSource" class="select-input">
             <option value="push">Push (Ingest token)</option>
             <option value="poll">Poll (fetch URL)</option>
           </select>
@@ -81,7 +81,7 @@
           <div class="grid grid-cols-3 gap-2">
             <div>
               <Label>Type</Label>
-              <select v-model="block.type" class="w-full border rounded px-2 py-1 text-sm bg-background">
+              <select v-model="block.type" class="select-input">
                 <option value="value">Value</option>
                 <option value="bar">Bar</option>
                 <option value="chart">Chart</option>

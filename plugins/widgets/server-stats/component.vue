@@ -67,8 +67,6 @@ const history = computed(() => {
   return [...base.slice(-9), live]
 })
 
-watch(liveData, () => refresh())
-
 const currentData = computed<Record<string, number>>(() => {
   if (liveData.value) return liveData.value as Record<string, number>
   if (history.value.length) return history.value[history.value.length - 1].payload
@@ -140,7 +138,8 @@ function buildChart() {
   })
 }
 
-watch(history, () => nextTick(buildChart), { deep: true })
+watch(history, () => nextTick(buildChart))
+watch(liveData, () => nextTick(buildChart))
 watch(chartEl, (el) => { if (el) nextTick(buildChart) })
 onUnmounted(() => { chart?.destroy(); chart = null })
 </script>
